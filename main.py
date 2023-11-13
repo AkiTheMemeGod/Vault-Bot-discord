@@ -2,7 +2,7 @@ import discord
 import responses
 import tokens
 import os
-
+from responses import get_whitelist, put_whitelist
 docs = ('.docx', '.pdf', '.pptx', '.xlsx', '.txt')
 pics = ('jpeg', 'jpg', 'png', 'webp')
 vids = ('.mp4', '.mkv', '.mov')
@@ -37,7 +37,6 @@ def run_discord_bot():
     @client.event
     async def on_ready():
         print(f'{client.user} is now running!')
-        x = 'peace'
         await client.change_presence(status=discord.Status.idle)
 
     @client.event
@@ -45,12 +44,13 @@ def run_discord_bot():
         username = str(message.author)
         user_message = str(message.content)
         channel = str(message.channel)
+
         print(f'{username} said: "{user_message}" ({channel})')
 
         if message.author == client.user:
             return
 
-        elif '?dm' in user_message:
+        elif '?bot' in user_message:
             response = await responses.get_response(user_message[1:])
             await send_message(message, response, is_private=True)
 
@@ -61,17 +61,17 @@ def run_discord_bot():
 
                     if attachment.filename.endswith(docs):
                         await attachment.save(f"docs/{attachment.filename}")
-                        response = f"Attachment {attachment.filename} saved!"
+                        response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                         await send_message(message, response, is_private=False)
 
                     if attachment.filename.endswith(pics):
                         await attachment.save(f"pics/{attachment.filename}")
-                        response = f"Attachment {attachment.filename} saved!"
+                        response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                         await send_message(message, response, is_private=False)
 
                     if attachment.filename.endswith(vids):
                         await attachment.save(f"vids/{attachment.filename}")
-                        response = f"Attachment {attachment.filename} saved!"
+                        response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                         await send_message(message, response, is_private=False)
                 else:
                     pass
@@ -95,6 +95,25 @@ def run_discord_bot():
                     await message.channel.send(embed=embed, file=file)
                 else:
                     response = "No docs found."
+                    await send_message(message, response, is_private=False)
+
+            elif '$whitelist' in user_message:
+                print("hi")
+                if user_message[11:] != "":
+                    w = get_whitelist()
+
+                    if user_message[11:]+'\n' in w:
+                        response = 'Already Whitelisted'
+                        await send_message(message, response, is_private=False)
+
+                    else:
+                        w.append(user_message[11:] + '\n')
+                        put_whitelist(w)
+                        response = f'{message.author.mention} Whitelisted ! '
+                        await send_message(message, response, is_private=False)
+
+                else:
+                    response = 'No name to be whitelisted ! '
                     await send_message(message, response, is_private=False)
 
             else:

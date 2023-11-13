@@ -1,6 +1,7 @@
 import os
 import random as rd
 import bot_replies as br
+
 docs = ('.docx', '.pdf', '.pptx', '.xlsx', '.txt')
 pics = ('jpeg', 'jpg', 'png', 'webp')
 vids = ('.mp4', '.mkv', '.mov')
@@ -24,12 +25,15 @@ def put_whitelist(tds, filepath="whitelist.txt"):
 
 async def get_response(message: str) -> str or dict:
     p_message = message.lower()
-    print(p_message[7:10])
+
     if 'bot' in p_message:
+
         if any(insult in p_message for insult in br.insults):
             return rd.choice(br.savage_bot_replies)
+
         else:
             return rd.choice(br.bot_responses)
+
     if '$roll' in message:
         return str(rd.randint(1, int(message[6:])))
 
@@ -40,36 +44,34 @@ async def get_response(message: str) -> str or dict:
         return {'file': f"wallpapers/{rd.choice(os.listdir('wallpapers'))}"}
 
     if "$fetch" in p_message:
+
         if p_message[7:10] == "doc":
             x = get_list('docs', docs)
-            print(x)
+
             if p_message[7:] != "":
                 return {'file': f"docs/{x[int(p_message[11:])-1]}"}
+
             else:
                 return f"Invalid file name {p_message[7:]}"
 
         if p_message[7:10].endswith(pics):
             y = get_list('pics', pics)
+
             if p_message[7:] != "":
                 return {'file': f"pics/{y[int(p_message[11:])-1]}"}
+
             else:
                 return f"Invalid file name {p_message[7:]}"
 
         if p_message[7:10].endswith(vids):
             z = get_list('vids', vids)
+
             if p_message[7:] != "":
                 return {'file': f"vids/{z[int(p_message[11:])-1]}"}
+
             else:
                 return f"Invalid file name {p_message[7:]}"
 
-    if '$whitelist' in p_message:
-        if p_message[11:] != "":
-            w = get_whitelist()
-            w.append(p_message[11:]+'\n')
-            put_whitelist(w)
-            return 'Whitelisted ! '
-        else:
-            return 'No name to be whitelisted ! '
     if message == '$restart':
         os.system('python main.py')
         exit()
