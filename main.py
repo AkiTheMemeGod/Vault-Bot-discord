@@ -16,13 +16,13 @@ bot = commands.Bot(command_prefix='?', intents=intents)
 
 # this must be visible in the raspberry pi
 
-def get_whitelist(filepath="whitelist.txt"):
+def get_whitelist(filepath="/home/kumar/bot/whitelist.txt"):
     with open(filepath, 'r') as file:
         todos = file.readlines()
     return todos
 
 
-def put_whitelist(tds, filepath="whitelist.txt"):
+def put_whitelist(tds, filepath="/home/kumar/bot/whitelist.txt"):
     with open(filepath, 'w') as file:
         file.writelines(tds)
 
@@ -66,10 +66,10 @@ async def bot_command(ctx):
 
 @bot.command(name='pics', aliases=['piclist'])
 async def pic_list_command(ctx):
-    pic_list = get_list('pics', pics)
+    pic_list = get_list('/home/kumar/bot/pics', pics)
     if pic_list:
         embed = create_embed("Picture List", "\n".join(pic_list))
-        file_path = 'Vault Bot(1).png'
+        file_path = '/home/kumar/bot/Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -79,10 +79,10 @@ async def pic_list_command(ctx):
 
 @bot.command(name='docs', aliases=['doclist'])
 async def doc_list_command(ctx):
-    doc_list = get_list('docs', docs)
+    doc_list = get_list('/home/kumar/bot/docs', docs)
     if doc_list:
         embed = create_embed("Documents List", "\n".join(doc_list))
-        file_path = 'Vault Bot(1).png'
+        file_path = '/home/kumar/bot/Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -92,10 +92,10 @@ async def doc_list_command(ctx):
 
 @bot.command(name='vids', aliases=['vidlist'])
 async def doc_list_command(ctx):
-    vid_list = get_list('vids', vids)
+    vid_list = get_list('/home/kumar/bot/vids', vids)
     if vid_list:
         embed = create_embed("Videos List", "\n".join(vid_list))
-        file_path = 'Vault Bot(1).png'
+        file_path = '/home/kumar/bot/Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -141,25 +141,25 @@ async def rdwalls_command(ctx):
 @bot.command(name='fetch')
 async def fetch_command(ctx, file_type: str, file_index: int):
     if file_type == 'doc':
-        x = get_list_for_fetch('docs', docs)
+        x = get_list_for_fetch('/home/kumar/bot/docs', docs)
         if 0 < file_index <= len(x):
-            response = {'file': f"docs/{x[file_index - 1]}"}
+            response = {'file': f"/home/kumar/bot/docs/{x[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
 
     elif file_type == 'pic':
-        y = get_list_for_fetch('pics', pics)
+        y = get_list_for_fetch('/home/kumar/bot/pics', pics)
         if 0 < file_index <= len(y):
-            response = {'file': f"pics/{y[file_index - 1]}"}
+            response = {'file': f"/home/kumar/bot/pics/{y[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
 
     elif file_type == 'vid':
-        z = get_list_for_fetch('vids', vids)
+        z = get_list_for_fetch('/home/kumar/bot/vids', vids)
         if 0 < file_index <= len(z):
-            response = {'file': f"vids/{z[file_index - 1]}"}
+            response = {'file': f"/home/kumar/bot/vids/{z[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
@@ -193,18 +193,18 @@ async def on_message(message):
             if channel == 'upload-files':
 
                 if attachment.filename.endswith(docs):
-                    await attachment.save(f"docs/{attachment.filename}")
+                    await attachment.save(f"/home/kumar/bot/docs/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
 
                 if attachment.filename.endswith(pics):
 
-                    await attachment.save(f"pics/{attachment.filename}")
+                    await attachment.save(f"/home/kumar/bot/pics/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
 
                 if attachment.filename.endswith(vids):
-                    await attachment.save(f"vids/{attachment.filename}")
+                    await attachment.save(f"/home/kumar/bot/vids/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
             else:
