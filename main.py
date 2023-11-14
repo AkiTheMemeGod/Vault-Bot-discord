@@ -105,19 +105,22 @@ async def doc_list_command(ctx):
 
 @bot.command(name='whitelist')
 async def whitelist_command(ctx, *, arg):
-    if arg != "":
-        w = get_whitelist()
+    try:
+        if arg != "":
+            w = get_whitelist()
 
-        if arg+'\n' in w:
-            response = 'Already Whitelisted'
-            await send_message(ctx, response, is_private=False)
+            if arg+'\n' in w:
+                response = 'Already Whitelisted'
+                await send_message(ctx, response, is_private=False)
 
-        else:
-            w.append(arg + '\n')
-            put_whitelist(w)
-            response = f'{ctx.author.mention} Whitelisted!'
-            await send_message(ctx, response, is_private=False)
-    else:
+            else:
+                w.append(arg + '\n')
+                put_whitelist(w)
+                response = f'{ctx.author.mention} Whitelisted!'
+                await send_message(ctx, response, is_private=False)
+
+    except Exception as e:
+        print(e)
         response = 'No name to be whitelisted!'
         await send_message(ctx, response, is_private=False)
 
