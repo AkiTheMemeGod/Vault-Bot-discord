@@ -14,6 +14,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='?', intents=intents)
 
+# this must be visible in the raspberry pi
 
 def get_whitelist(filepath="whitelist.txt"):
     with open(filepath, 'r') as file:

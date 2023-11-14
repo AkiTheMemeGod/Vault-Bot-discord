@@ -5,7 +5,7 @@ insults = [
     "no-skin", "disconnect", "lootgoblin", "minmax", "npc", "zerg", "fragile", "campfire", "zerokd",
     "smurf", "grinder", "gameover", "uninstall", "404", "respawn", "doormat", "facepalm", "zombie", "kappa"
 ]
-
+# this must be visible in the raspberry pi
 bot_responses = [
     "Hey there! What's cookin', human??",
     "Yo! Chat's lit with human?'s presence!",
