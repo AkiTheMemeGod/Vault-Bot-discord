@@ -15,7 +15,6 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='?', intents=intents)
 
 
-
 def get_whitelist(filepath="whitelist.txt"):
     with open(filepath, 'r') as file:
         todos = file.readlines()
