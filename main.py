@@ -123,22 +123,25 @@ async def doc_list_command(ctx):
 
 @bot.command(name='whitelist')
 async def whitelist_command(ctx, *, arg=""):
+    if str(ctx.author)+'\n' in get_whitelist():
+        if arg != "":
+            w = get_whitelist()
 
-    if arg != "":
-        w = get_whitelist()
+            if arg+'\n' in w:
+                response = 'Already Whitelisted'
+                await send_message(ctx, response, is_private=False)
 
-        if arg+'\n' in w:
-            response = 'Already Whitelisted'
-            await send_message(ctx, response, is_private=False)
+            else:
+                w.append(arg + '\n')
+                put_whitelist(w)
+                response = f'{ctx.author.mention} Whitelisted!'
+                await send_message(ctx, response, is_private=False)
 
         else:
-            w.append(arg + '\n')
-            put_whitelist(w)
-            response = f'{ctx.author.mention} Whitelisted!'
+            response = 'No name to be whitelisted!'
             await send_message(ctx, response, is_private=False)
-
     else:
-        response = 'No name to be whitelisted!'
+        response = "You don't have whitelisting permissions :( !"
         await send_message(ctx, response, is_private=False)
 
 '''
@@ -228,6 +231,9 @@ async def on_message(message):
                     await message.channel.send(response)
             else:
                 pass
+    else:
+        response = f"You dont have access to upload things yet! - get whitelisted from the admin :)"
+        await message.channel.send(response)
 
     await bot.process_commands(message)
 
