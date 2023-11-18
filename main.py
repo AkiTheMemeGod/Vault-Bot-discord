@@ -14,7 +14,21 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='?', intents=intents)
 
-# this must be visible in the raspberry pi
+
+def directory(username, what):
+    path = f"Vault/{username}/{what}/"
+    if os.path.exists(path):
+        return path
+    else:
+        if os.path.exists(f"Vault/{username}"):
+            pass
+        else:
+            os.mkdir(f"Vault/{username}")
+        if os.path.exists(path):
+            pass
+        else:
+            os.mkdir(path)
+            return path
 
 
 def get_whitelist(filepath="whitelist.txt"):
@@ -67,7 +81,8 @@ async def bot_command(ctx):
 
 @bot.command(name='pics', aliases=['piclist'])
 async def pic_list_command(ctx):
-    pic_list = get_list('pics', pics)
+    username = str(ctx.author)
+    pic_list = get_list(directory(username, "pics"), pics)
     if pic_list:
         embed = create_embed("Picture List", "\n".join(pic_list))
         file_path = 'Vault Bot(1).png'
@@ -80,7 +95,8 @@ async def pic_list_command(ctx):
 
 @bot.command(name='docs', aliases=['doclist'])
 async def doc_list_command(ctx):
-    doc_list = get_list('docs', docs)
+    username = str(ctx.author)
+    doc_list = get_list(directory(username, "docs"), docs)
     if doc_list:
         embed = create_embed("Documents List", "\n".join(doc_list))
         file_path = 'Vault Bot(1).png'
@@ -93,7 +109,8 @@ async def doc_list_command(ctx):
 
 @bot.command(name='vids', aliases=['vidlist'])
 async def doc_list_command(ctx):
-    vid_list = get_list('vids', vids)
+    username = str(ctx.author)
+    vid_list = get_list(directory(username, "vids"), vids)
     if vid_list:
         embed = create_embed("Videos List", "\n".join(vid_list))
         file_path = 'Vault Bot(1).png'
@@ -140,26 +157,27 @@ async def rdwalls_command(ctx):
 
 @bot.command(name='fetch')
 async def fetch_command(ctx, file_type: str, file_index: int):
+    username = str(ctx.author)
     if file_type == 'doc':
-        x = get_list_for_fetch('docs', docs)
+        x = get_list_for_fetch(directory(username, "docs"), docs)
         if 0 < file_index <= len(x):
-            response = {'file': f"docs/{x[file_index - 1]}"}
+            response = {'file': f"{directory(username,'docs')}/{x[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
 
     elif file_type == 'pic':
-        y = get_list_for_fetch('pics', pics)
+        y = get_list_for_fetch(directory(username, "pics"), pics)
         if 0 < file_index <= len(y):
-            response = {'file': f"pics/{y[file_index - 1]}"}
+            response = {'file': f"{directory(username,'pics')}/{y[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
 
     elif file_type == 'vid':
-        z = get_list_for_fetch('vids', vids)
+        z = get_list_for_fetch({directory(username,'vids')}, vids)
         if 0 < file_index <= len(z):
-            response = {'file': f"vids/{z[file_index - 1]}"}
+            response = {'file': f"{directory(username,'vids')}/{z[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
@@ -187,25 +205,25 @@ async def on_message(message):
             await message.channel.send(random.choice(br.bot_responses))
 
     if username+"\n" in get_whitelist():
-        print("user authorized")
+
         if message.attachments:
 
             attachment = message.attachments[0]
             if channel == 'upload-files':
-
+                print("user authorized")
                 if attachment.filename.endswith(docs):
-                    await attachment.save(f"docs/{attachment.filename}")
+                    await attachment.save(f"{directory(username,'docs')}/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
 
                 if attachment.filename.endswith(pics):
 
-                    await attachment.save(f"pics/{attachment.filename}")
+                    await attachment.save(f"{directory(username,'pics')}/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
 
                 if attachment.filename.endswith(vids):
-                    await attachment.save(f"vids/{attachment.filename}")
+                    await attachment.save(f"{directory(username,'vids')}/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
             else:
