@@ -16,13 +16,14 @@ bot = commands.Bot(command_prefix='?', intents=intents)
 
 # this must be visible in the raspberry pi
 
-def get_whitelist(filepath="/home/kumar/bot/whitelist.txt"):
+
+def get_whitelist(filepath="whitelist.txt"):
     with open(filepath, 'r') as file:
-        todos = file.readlines()
-    return todos
+        whites = file.readlines()
+    return whites
 
 
-def put_whitelist(tds, filepath="/home/kumar/bot/whitelist.txt"):
+def put_whitelist(tds, filepath="whitelist.txt"):
     with open(filepath, 'w') as file:
         file.writelines(tds)
 
@@ -66,10 +67,10 @@ async def bot_command(ctx):
 
 @bot.command(name='pics', aliases=['piclist'])
 async def pic_list_command(ctx):
-    pic_list = get_list('/home/kumar/bot/pics', pics)
+    pic_list = get_list('pics', pics)
     if pic_list:
         embed = create_embed("Picture List", "\n".join(pic_list))
-        file_path = '/home/kumar/bot/Vault Bot(1).png'
+        file_path = 'Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -79,10 +80,10 @@ async def pic_list_command(ctx):
 
 @bot.command(name='docs', aliases=['doclist'])
 async def doc_list_command(ctx):
-    doc_list = get_list('/home/kumar/bot/docs', docs)
+    doc_list = get_list('docs', docs)
     if doc_list:
         embed = create_embed("Documents List", "\n".join(doc_list))
-        file_path = '/home/kumar/bot/Vault Bot(1).png'
+        file_path = 'Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -92,10 +93,10 @@ async def doc_list_command(ctx):
 
 @bot.command(name='vids', aliases=['vidlist'])
 async def doc_list_command(ctx):
-    vid_list = get_list('/home/kumar/bot/vids', vids)
+    vid_list = get_list('vids', vids)
     if vid_list:
         embed = create_embed("Videos List", "\n".join(vid_list))
-        file_path = '/home/kumar/bot/Vault Bot(1).png'
+        file_path = 'Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -104,23 +105,22 @@ async def doc_list_command(ctx):
 
 
 @bot.command(name='whitelist')
-async def whitelist_command(ctx, *, arg):
-    try:
-        if arg != "":
-            w = get_whitelist()
+async def whitelist_command(ctx, *, arg=""):
 
-            if arg+'\n' in w:
-                response = 'Already Whitelisted'
-                await send_message(ctx, response, is_private=False)
+    if arg != "":
+        w = get_whitelist()
 
-            else:
-                w.append(arg + '\n')
-                put_whitelist(w)
-                response = f'{ctx.author.mention} Whitelisted!'
-                await send_message(ctx, response, is_private=False)
+        if arg+'\n' in w:
+            response = 'Already Whitelisted'
+            await send_message(ctx, response, is_private=False)
 
-    except Exception as e:
-        print(e)
+        else:
+            w.append(arg + '\n')
+            put_whitelist(w)
+            response = f'{ctx.author.mention} Whitelisted!'
+            await send_message(ctx, response, is_private=False)
+
+    else:
         response = 'No name to be whitelisted!'
         await send_message(ctx, response, is_private=False)
 
@@ -141,25 +141,25 @@ async def rdwalls_command(ctx):
 @bot.command(name='fetch')
 async def fetch_command(ctx, file_type: str, file_index: int):
     if file_type == 'doc':
-        x = get_list_for_fetch('/home/kumar/bot/docs', docs)
+        x = get_list_for_fetch('docs', docs)
         if 0 < file_index <= len(x):
-            response = {'file': f"/home/kumar/bot/docs/{x[file_index - 1]}"}
+            response = {'file': f"docs/{x[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
 
     elif file_type == 'pic':
-        y = get_list_for_fetch('/home/kumar/bot/pics', pics)
+        y = get_list_for_fetch('pics', pics)
         if 0 < file_index <= len(y):
-            response = {'file': f"/home/kumar/bot/pics/{y[file_index - 1]}"}
+            response = {'file': f"pics/{y[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
 
     elif file_type == 'vid':
-        z = get_list_for_fetch('/home/kumar/bot/vids', vids)
+        z = get_list_for_fetch('vids', vids)
         if 0 < file_index <= len(z):
-            response = {'file': f"/home/kumar/bot/vids/{z[file_index - 1]}"}
+            response = {'file': f"vids/{z[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
         else:
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
@@ -186,25 +186,26 @@ async def on_message(message):
         else:
             await message.channel.send(random.choice(br.bot_responses))
 
-    if username == "akithememegod":
+    if username+"\n" in get_whitelist():
+        print("user authorized")
         if message.attachments:
 
             attachment = message.attachments[0]
             if channel == 'upload-files':
 
                 if attachment.filename.endswith(docs):
-                    await attachment.save(f"/home/kumar/bot/docs/{attachment.filename}")
+                    await attachment.save(f"docs/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
 
                 if attachment.filename.endswith(pics):
 
-                    await attachment.save(f"/home/kumar/bot/pics/{attachment.filename}")
+                    await attachment.save(f"pics/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
 
                 if attachment.filename.endswith(vids):
-                    await attachment.save(f"/home/kumar/bot/vids/{attachment.filename}")
+                    await attachment.save(f"vids/{attachment.filename}")
                     response = f"{message.author.mention} Attachment {attachment.filename} saved!"
                     await message.channel.send(response)
             else:
