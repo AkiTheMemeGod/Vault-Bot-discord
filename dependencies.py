@@ -8,14 +8,14 @@ vids = ('.mp4', '.mkv', '.mov')
 
 
 def directory(username, what):
-    path = f"Vault/{username}/{what}/"
+    path = f"/home/kumar/bot/Vault/{username}/{what}/"
     if os.path.exists(path):
         return path
     else:
-        if os.path.exists(f"Vault/{username}"):
+        if os.path.exists(f"/home/kumar/bot/Vault/{username}"):
             pass
         else:
-            os.mkdir(f"Vault/{username}")
+            os.mkdir(f"/home/kumar/bot/Vault/{username}")
         if os.path.exists(path):
             pass
         else:
@@ -23,13 +23,13 @@ def directory(username, what):
             return path
 
 
-def get_whitelist(filepath="whitelist.txt"):
+def get_whitelist(filepath="/home/kumar/bot/whitelist.txt"):
     with open(filepath, 'r') as file:
         whites = file.readlines()
     return whites
 
 
-def put_whitelist(tds, filepath="whitelist.txt"):
+def put_whitelist(tds, filepath="/home/kumar/bot/whitelist.txt"):
     with open(filepath, 'w') as file:
         file.writelines(tds)
 

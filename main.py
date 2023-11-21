@@ -35,7 +35,7 @@ async def pic_list_command(ctx):
     pic_list = get_list(directory(username, "pics"), pics)
     if pic_list:
         embed = create_embed("Picture List", "\n".join(pic_list))
-        file_path = 'Vault Bot(1).png'
+        file_path = '/home/kumar/bot/Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -49,7 +49,7 @@ async def doc_list_command(ctx):
     doc_list = get_list(directory(username, "docs"), docs)
     if doc_list:
         embed = create_embed("Documents List", "\n".join(doc_list))
-        file_path = 'Vault Bot(1).png'
+        file_path = '/home/kumar/bot/Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -63,7 +63,7 @@ async def doc_list_command(ctx):
     vid_list = get_list(directory(username, "vids"), vids)
     if vid_list:
         embed = create_embed("Videos List", "\n".join(vid_list))
-        file_path = 'Vault Bot(1).png'
+        file_path = '/home/kumar/bot/Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
