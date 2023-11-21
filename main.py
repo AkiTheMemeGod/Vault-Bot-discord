@@ -1,61 +1,15 @@
-import discord
-from discord.ext import commands
-import tokens
-import os
 import random
-import bot_replies as br
+import time
 
-docs = ('.docx', '.pdf', '.pptx', '.xlsx', '.txt', '.zip')
-pics = ('jpeg', 'jpg', 'png', 'webp')
-vids = ('.mp4', '.mkv', '.mov')
-greetings = ('hello', 'hi', 'hey', 'yo', 'sup', 'morning', 'afternoon', 'evening', 'hola', 'ciao', 'bonjour', 'hallo', 'howdy', 'aloha', 'greetings', 'yo', 'hiya', 'salut', 'hail', 'hi')
+from discord.ext import commands
+
+import bot_replies as br
+import tokens
+from dependencies import *
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='?', intents=intents)
-
-
-def directory(username, what):
-    path = f"Vault/{username}/{what}/"
-    if os.path.exists(path):
-        return path
-    else:
-        if os.path.exists(f"Vault/{username}"):
-            pass
-        else:
-            os.mkdir(f"Vault/{username}")
-        if os.path.exists(path):
-            pass
-        else:
-            os.mkdir(path)
-            return path
-
-
-def get_whitelist(filepath="whitelist.txt"):
-    with open(filepath, 'r') as file:
-        whites = file.readlines()
-    return whites
-
-
-def put_whitelist(tds, filepath="whitelist.txt"):
-    with open(filepath, 'w') as file:
-        file.writelines(tds)
-
-
-def get_list(path, filetype):
-    list_of_things = [str(i+1)+'.' + file for i, file in enumerate(os.listdir(path)) if file.endswith(filetype)]
-    return list_of_things
-
-
-def get_list_for_fetch(path, filetype):
-    list_of_things = [file for file in os.listdir(path) if file.endswith(filetype)]
-    return list_of_things
-
-
-def create_embed(title, description):
-    embed = discord.Embed(title=title, description=description, color=discord.Color.pink())
-    embed.set_thumbnail(url='attachment://Vault Bot(1).png')
-    return embed
 
 
 async def send_message(ctx, response, is_private):
@@ -68,15 +22,11 @@ async def send_message(ctx, response, is_private):
         print(e)
 
 
-@bot.event
-async def on_ready():
-    print(f'{bot.user} is now running!')
-    await bot.change_presence(status=discord.Status.idle)
-
-
 @bot.command(name='dm')
 async def bot_command(ctx):
-    await send_message(ctx, response=random.choice(br.bot_responses), is_private=True)
+    response = f"I slid into your dm :wink:"
+    await send_message(ctx, response=response, is_private=True)
+    await ctx.message.delete()
 
 
 @bot.command(name='pics', aliases=['piclist'])
@@ -178,7 +128,7 @@ async def fetch_command(ctx, file_type: str, file_index: int):
             await ctx.send(f"Invalid file index {file_index} for {file_type}")
 
     elif file_type == 'vid':
-        z = get_list_for_fetch({directory(username,'vids')}, vids)
+        z = get_list_for_fetch(f"{directory(username,'vids')}", vids)
         if 0 < file_index <= len(z):
             response = {'file': f"{directory(username,'vids')}/{z[file_index - 1]}"}
             await ctx.send(file=discord.File(response['file']))
@@ -187,6 +137,40 @@ async def fetch_command(ctx, file_type: str, file_index: int):
 
     else:
         await ctx.send(f"Invalid file type {file_type}")
+
+
+@bot.command(name='delete')
+async def delete_command(ctx, arg, pin=""):
+    if str(ctx.author) == 'akithememegod':
+        if pin == '273636':
+            try:
+                if arg.lower() == 'all':
+                    await ctx.channel.purge(limit=None)
+                    await ctx.send("Nothing happened here :pepehands: :gun:")
+                else:
+                    try:
+                        limit = int(arg)
+                        if limit > 0:
+                            await ctx.channel.purge(limit=limit + 1)
+                        else:
+                            await ctx.send("Please provide a positive integer for the number of messages to delete.")
+                    except ValueError:
+                        await ctx.send("Invalid argument. Use a positive integer or 'all'.")
+            except Exception as e:
+                print(e)
+                await ctx.send("An error occurred while processing the command.")
+        elif pin == "":
+            await ctx.send("Provide the admin pin to proceed further, try again")
+        else:
+            await ctx.send("wrong pin !")
+    else:
+        await ctx.send("You dont have permissions to do that :rofl:")
+
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user} is now running!')
+    await bot.change_presence(status=discord.Status.idle)
 
 
 @bot.event
@@ -211,24 +195,24 @@ async def on_message(message):
 
         if message.attachments:
 
-            attachment = message.attachments[0]
+            attachments = message.attachments
             if channel == 'upload-files':
                 print("user authorized")
-                if attachment.filename.endswith(docs):
-                    await attachment.save(f"{directory(username,'docs')}/{attachment.filename}")
-                    response = f"{message.author.mention} Attachment {attachment.filename} saved!"
-                    await message.channel.send(response)
+                for attachment in attachments:
+                    if attachment.filename.endswith(docs):
+                        await attachment.save(f"{directory(username,'docs')}/{attachment.filename}")
 
-                if attachment.filename.endswith(pics):
+                    if attachment.filename.endswith(pics):
+                        await attachment.save(f"{directory(username,'pics')}/{attachment.filename}")
 
-                    await attachment.save(f"{directory(username,'pics')}/{attachment.filename}")
-                    response = f"{message.author.mention} Attachment {attachment.filename} saved!"
-                    await message.channel.send(response)
+                    if attachment.filename.endswith(vids):
+                        await attachment.save(f"{directory(username,'vids')}/{attachment.filename}")
 
-                if attachment.filename.endswith(vids):
-                    await attachment.save(f"{directory(username,'vids')}/{attachment.filename}")
-                    response = f"{message.author.mention} Attachment {attachment.filename} saved!"
-                    await message.channel.send(response)
+                response = f"{message.author.mention} saved at {time.asctime()}"
+                await message.channel.send(response)
+
+                await message.delete()
+
             else:
                 pass
     else:
