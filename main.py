@@ -57,6 +57,7 @@ async def doc_list_command(ctx):
         await send_message(ctx, response, is_private=False)
 
 
+
 @bot.command(name='vids', aliases=['vidlist'])
 async def doc_list_command(ctx):
     username = str(ctx.author)
