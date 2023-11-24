@@ -3,7 +3,7 @@ insults = [
     "trash", "peasant", "sweat", "tryhard", "nerfed", "crash", "hack", "rekt", "salty", "scrub",
     "fail", "epicfail", "gg ez", "spawnkill", "toxic", "drooler", "gank", "pwned", "lameboi", "bleeder",
     "no-skin", "disconnect", "lootgoblin", "minmax", "npc", "zerg", "fragile", "campfire", "zerokd",
-    "smurf", "grinder", "gameover", "uninstall", "404", "respawn", "doormat", "facepalm", "zombie", "kappa"
+    "smurf", "grinder", "gameover", "uninstall", "404", "respawn", "doormat", "facepalm", "zombie", "kappa", "idiot"
 ]
 # this must be visible in the raspberry pi
 bot_responses = [

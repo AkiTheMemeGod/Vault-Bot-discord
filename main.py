@@ -1,6 +1,5 @@
 import random
 import time
-
 from discord.ext import commands
 
 import bot_replies as br
@@ -9,7 +8,7 @@ from dependencies import *
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='?', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 
 async def send_message(ctx, response, is_private):
@@ -20,6 +19,22 @@ async def send_message(ctx, response, is_private):
             await ctx.author.send(response) if is_private else await ctx.send(response)
     except Exception as e:
         print(e)
+
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user} is now running!')
+    await bot.change_presence(status=discord.Status.idle)
+
+    channel_id = 1176920698640408576
+    startup_channel = bot.get_channel(channel_id)
+
+    if startup_channel:
+        await startup_channel.purge(limit=None)
+        await startup_channel.send("@everyone"
+                                   "https://tenor.com/view/getting-online-getting-online-gif-27546602")
+    else:
+        print("Could not find the specified channel for startup message.")
 
 
 @bot.command(name='dm')
@@ -35,7 +50,7 @@ async def pic_list_command(ctx):
     pic_list = get_list(directory(username, "pics"), pics)
     if pic_list:
         embed = create_embed("Picture List", "\n".join(pic_list))
-        file_path = '/home/kumar/bot/Vault Bot(1).png'
+        file_path = 'Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -49,13 +64,12 @@ async def doc_list_command(ctx):
     doc_list = get_list(directory(username, "docs"), docs)
     if doc_list:
         embed = create_embed("Documents List", "\n".join(doc_list))
-        file_path = '/home/kumar/bot/Vault Bot(1).png'
+        file_path = 'Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
         response = "No documents found."
         await send_message(ctx, response, is_private=False)
-
 
 
 @bot.command(name='vids', aliases=['vidlist'])
@@ -64,7 +78,7 @@ async def doc_list_command(ctx):
     vid_list = get_list(directory(username, "vids"), vids)
     if vid_list:
         embed = create_embed("Videos List", "\n".join(vid_list))
-        file_path = '/home/kumar/bot/Vault Bot(1).png'
+        file_path = 'Vault Bot(1).png'
         file = discord.File(file_path)
         await ctx.send(embed=embed, file=file)
     else:
@@ -74,80 +88,60 @@ async def doc_list_command(ctx):
 
 @bot.command(name='whitelist')
 async def whitelist_command(ctx, *, arg=""):
-    if str(ctx.author)+'\n' in get_whitelist():
-        if arg != "":
-            w = get_whitelist()
+    if str(ctx.channel) == 'whitelist-people':
+        if str(ctx.author)+'\n' in get_whitelist():
+            if arg != "":
+                w = get_whitelist()
 
-            if arg+'\n' in w:
-                response = 'Already Whitelisted'
-                await send_message(ctx, response, is_private=False)
+                if arg+'\n' in w:
+                    response = 'Already Whitelisted'
+                    await send_message(ctx, response, is_private=False)
+                    await ctx.message.delete()
+
+                else:
+                    w.append(arg + '\n')
+                    put_whitelist(w)
+                    response = f'{ctx.author.mention} Whitelisted!'
+                    await send_message(ctx, response, is_private=False)
+                    await ctx.message.delete()
 
             else:
-                w.append(arg + '\n')
-                put_whitelist(w)
-                response = f'{ctx.author.mention} Whitelisted!'
+                response = 'No name to be whitelisted!'
                 await send_message(ctx, response, is_private=False)
-
         else:
-            response = 'No name to be whitelisted!'
+            response = "You don't have whitelisting permissions :( !"
             await send_message(ctx, response, is_private=False)
+            await ctx.message.delete()
     else:
-        response = "You don't have whitelisting permissions :( !"
-        await send_message(ctx, response, is_private=False)
-
-'''
-@bot.command(name='roll')
-async def roll_command(ctx, max_value: int):
-    response = str(random.randint(1, max_value))
-    await ctx.send(response)
+        await ctx.message.delete()
+        response = ("Wrong channel :no_entry_sign:"
+                    " head over to : https://discord.com/channels/940587857414864976/1176913093050257440")
+        await send_message(ctx, response=response, is_private=False)
 
 
-@bot.command(name='rdwalls')
-async def rdwalls_command(ctx):
-    file_path = f"wallpapers/{random.choice(os.listdir('wallpapers'))}"
-    response = {'file': file_path}
-    await ctx.send(file=discord.File(response['file']))'''
-
-
-@bot.command(name='fetch')
-async def fetch_command(ctx, file_type: str, file_index: int):
-    username = str(ctx.author)
-    if file_type == 'doc':
-        x = get_list_for_fetch(directory(username, "docs"), docs)
-        if 0 < file_index <= len(x):
-            response = {'file': f"{directory(username,'docs')}/{x[file_index - 1]}"}
-            await ctx.send(file=discord.File(response['file']))
-        else:
-            await ctx.send(f"Invalid file index {file_index} for {file_type}")
-
-    elif file_type == 'pic':
-        y = get_list_for_fetch(directory(username, "pics"), pics)
-        if 0 < file_index <= len(y):
-            response = {'file': f"{directory(username,'pics')}/{y[file_index - 1]}"}
-            await ctx.send(file=discord.File(response['file']))
-        else:
-            await ctx.send(f"Invalid file index {file_index} for {file_type}")
-
-    elif file_type == 'vid':
-        z = get_list_for_fetch(f"{directory(username,'vids')}", vids)
-        if 0 < file_index <= len(z):
-            response = {'file': f"{directory(username,'vids')}/{z[file_index - 1]}"}
-            await ctx.send(file=discord.File(response['file']))
-        else:
-            await ctx.send(f"Invalid file index {file_index} for {file_type}")
-
+@bot.command(name="fetch")
+async def fetch(ctx, file_type: str = ""):
+    if file_type == "docs":
+        view = MySelectDoc()
+        await ctx.send(f"Fetching", view=view)
+    elif file_type == "pics":
+        view = MySelectPic()
+        await ctx.send(f"Fetching", view=view)
+    elif file_type == "vids":
+        view = MySelectVid()
+        await ctx.send(f"Fetching", view=view)
     else:
-        await ctx.send(f"Invalid file type {file_type}")
+        await ctx.send(f"Arguments are : docs , pics, vids")
 
 
 @bot.command(name='delete')
 async def delete_command(ctx, arg, pin=""):
     if str(ctx.author) == 'akithememegod':
-        if pin == '273636':
+        if pin == tokens.admin_pin:
             try:
                 if arg.lower() == 'all':
                     await ctx.channel.purge(limit=None)
-                    await ctx.send("Nothing happened here :pepehands: :gun:")
+                    await ctx.send("https://tenor.com/view/forget-never-happened-never-mind-men-in-black-gif-14323858974282234206")
                 else:
                     try:
                         limit = int(arg)
@@ -169,12 +163,6 @@ async def delete_command(ctx, arg, pin=""):
 
 
 @bot.event
-async def on_ready():
-    print(f'{bot.user} is now running!')
-    await bot.change_presence(status=discord.Status.idle)
-
-
-@bot.event
 async def on_message(message):
     username = str(message.author)
     user_message = str(message.content)
@@ -192,12 +180,10 @@ async def on_message(message):
         else:
             await message.channel.send(random.choice(br.bot_responses))
 
-    if username+"\n" in get_whitelist():
-
-        if message.attachments:
-
+    if message.attachments:
+        if channel == 'upload-files':
             attachments = message.attachments
-            if channel == 'upload-files':
+            if username + "\n" in get_whitelist():
                 print("user authorized")
                 for attachment in attachments:
                     if attachment.filename.endswith(docs):
@@ -213,18 +199,33 @@ async def on_message(message):
                 await message.channel.send(response)
 
                 await message.delete()
-
             else:
-                pass
-    else:
-        response = f"You dont have access to upload things yet! - get whitelisted from the admin :)"
-        await message.channel.send(response)
+                response = "You are not whitelisted Yet to upload stuffs here :rofl:"
+                await message.channel.send(response)
+                await message.delete()
+
+        else:
+            response = ("You can't upload files here :no_entry_sign:"
+                        "\nhead over to --> https://discord.com/channels/940587857414864976/1173226074075824259")
+            await message.channel.send(response)
+            await message.delete()
+
+
 
     await bot.process_commands(message)
 
 
-def run_discord_bot():
-    bot.run(tokens.token)
+@bot.event
+async def on_shutdown():
+    print("hi")
+    channel = bot.get_channel(1176920698640408576)
 
+    if channel:
+        print("hi")
+        await channel.send("I'm going offline. Goodbye!")
 
-
+try:
+    def run_discord_bot():
+        bot.run(tokens.token)
+except KeyboardInterrupt:
+    on_shutdown()
