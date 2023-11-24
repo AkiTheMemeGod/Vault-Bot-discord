@@ -134,6 +134,23 @@ class MySelectVid(View):
             await interaction.user.send(f"Invalid file type {file}")
 
 
+def get_prefix(bot, message):
+    with open("prefix.txt", 'r') as file:
+        prefix = file.read()
+    return prefix
+
+
+def get_pre():
+    with open("prefix.txt", 'r') as file:
+        prefix = file.read()
+    return prefix
+
+
+def put_prefix(arg, filepath="prefix.txt"):
+    with open(filepath, 'w') as file:
+        file.write(arg)
+
+
 '''def get_select_options(file_list):
     # Check if file_list is empty or contains the default option
     if not file_list or (len(file_list) == 1 and file_list[0] == "loading"):

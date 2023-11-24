@@ -8,7 +8,7 @@ from dependencies import *
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix=get_prefix, intents=intents)
 
 
 async def send_message(ctx, response, is_private):
@@ -170,9 +170,9 @@ async def on_message(message):
 
     print(f'{username} said: "{user_message}" ({channel})')
 
-    if message.author == bot.user:
+    if message.author == bot.user :
         return
-    if 'bot' in user_message:
+    if 'bot' in user_message and str(message.author) != "Aki's Chat-Bot#6062":
 
         if any(insult in user_message for insult in br.insults):
             await message.channel.send(random.choice(br.savage_bot_replies))
@@ -210,7 +210,13 @@ async def on_message(message):
             await message.channel.send(response)
             await message.delete()
 
+    if f"{get_pre()}change prefix to" in user_message:
+        put_prefix(user_message[18:19])
+        await message.channel.send(f"{message.author.mention} the prefix has been changed to `{get_pre()}`")
 
+    if "prefix?" == user_message:
+        response = f"`{get_pre()}` is the current prefix for the bot-->{bot.user}"
+        await message.channel.send(response)
 
     await bot.process_commands(message)
 
