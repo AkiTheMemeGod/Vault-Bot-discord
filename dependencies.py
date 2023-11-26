@@ -1,7 +1,7 @@
 import os
 
 import discord
-from discord.ui import View
+from discord.ui import View, Select
 
 docs = ('.docx', '.pdf', '.pptx', '.xlsx', '.txt', '.zip')
 pics = ('jpeg', 'jpg', 'png', 'webp')
@@ -82,20 +82,22 @@ class MySelectDoc(View):
             await interaction.user.send(f"Invalid file type {file}")
 
 
-class MySelectPic(View):
+'''class MySelectPic(View):
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+        self.select.options = self.options
     @discord.ui.select(
-        placeholder="Choose a Picture",
-        options=[discord.SelectOption(label=file,
-                                      value=str(index)) for index, file in enumerate(
-            get_list_for_fetch(directory('akithememegod', "pics"), files["pics"]),
-            start=0)])
+        placeholder="Choose a Picture")
     async def select_callback(self, interaction, select):
+
         select.disabled = True
         file = select.values[0]
-        print(file)
-        username = str(interaction.user)
+        username = self.name
         file_list = get_list_for_fetch(directory(username, "pics"), pics)
-        print(file_list)
+        select.options = [discord.SelectOption(label=file, value=str(index)) for index, file in enumerate(
+            file_list,
+            start=0)]
 
         if file_list[int(file)] in file_list:
             if not file_list:
@@ -106,7 +108,45 @@ class MySelectPic(View):
             await interaction.message.delete()
 
         else:
+            await interaction.user.send(f"Invalid file type {file}")'''
+
+
+class MySelectPic(discord.ui.Item):
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+
+        # Placeholder for the select menu
+        self.select = discord.ui.Select(placeholder="Choose a Picture", custom_id="select_pic")
+
+        # Set the initial options during the initialization
+        self.set_options()
+
+    def set_options(self):
+        file_list = get_list_for_fetch(directory(self.name, "pics"), files["pics"])
+
+        if not file_list:
+            self.select.add_option(label="No pictures available", value="none", default=True)
+        else:
+            for index, file in enumerate(file_list, start=1):
+                self.select.add_option(label=file, value=str(index))
+
+    async def select_callback(self, interaction, select):
+        select.disabled = True
+        file_list = get_list_for_fetch(directory(self.name, "pics"), files["pics"])
+
+        file = select.values[0]
+        file_index = int(file)
+
+        if 1 <= file_index <= len(file_list):
+            file_path = f"{directory(self.name, 'pics')}/{file_list[file_index - 1]}"
+            await interaction.channel.send(file=discord.File(file_path))
+            await interaction.message.delete()
+        else:
             await interaction.user.send(f"Invalid file type {file}")
+
+    def to_dict(self):
+        return self.select.to_component_dict()
 
 
 class MySelectVid(View):

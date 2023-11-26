@@ -125,7 +125,10 @@ async def fetch(ctx, file_type: str = ""):
         view = MySelectDoc()
         await ctx.send(f"Fetching", view=view)
     elif file_type == "pics":
-        view = MySelectPic()
+        name = str(ctx.author)
+        pic_selector = MySelectPic(name)
+        view = discord.ui.View()
+        view.add_item(pic_selector)
         await ctx.send(f"Fetching", view=view)
     elif file_type == "vids":
         view = MySelectVid()
