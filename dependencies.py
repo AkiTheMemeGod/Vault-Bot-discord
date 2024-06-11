@@ -82,7 +82,7 @@ class MySelectDoc(View):
             await interaction.user.send(f"Invalid file type {file}")
 
 
-'''class MySelectPic(View):
+class MySelectPic(View):
     def __init__(self, name):
         super().__init__()
         self.name = name
@@ -108,10 +108,10 @@ class MySelectDoc(View):
             await interaction.message.delete()
 
         else:
-            await interaction.user.send(f"Invalid file type {file}")'''
+            await interaction.user.send(f"Invalid file type {file}")
 
 
-class MySelectPic(discord.ui.Item):
+"""class MySelectPic(discord.ui.Item):
     def __init__(self, name):
         super().__init__()
         self.name = name
@@ -147,7 +147,7 @@ class MySelectPic(discord.ui.Item):
 
     def to_dict(self):
         return self.select.to_component_dict()
-
+"""
 
 class MySelectVid(View):
     @discord.ui.select(

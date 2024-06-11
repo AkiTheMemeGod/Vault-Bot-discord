@@ -1,2 +1,2 @@
-token = 'MTE3MzIxNTA2NTg2NDkzNzUzNA.GkW-7U.GvBCbjPMCzkXR5qoDvlap5Gu3PLzJs-NL6Z_Ww'
+token = 'MTE3MzIxNTA2NTg2NDkzNzUzNA.G9fwft.NIGhkMEIKkzjL2ue2FJ_QM28P2qiiiX4tPpb1Q'
 admin_pin = "273636"

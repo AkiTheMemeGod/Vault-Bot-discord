@@ -1,5 +1,7 @@
 import random
 import time
+
+import discord
 from discord.ext import commands
 
 import bot_replies as br
@@ -24,6 +26,7 @@ async def send_message(ctx, response, is_private):
 @bot.event
 async def on_ready():
     print(f'{bot.user} is now running!')
+    await bot.tree.sync()
     await bot.change_presence(status=discord.Status.idle)
 
     channel_id = 1176920698640408576
@@ -39,9 +42,9 @@ async def on_ready():
 
 @bot.command(name='dm')
 async def bot_command(ctx):
-    response = f"I slid into your dm :wink:"
-    await send_message(ctx, response=response, is_private=True)
-    await ctx.message.delete()
+    response = f" I slid into your dm :wink:"
+    await send_message(ctx, response=ctx.author.mention + response, is_private=False)
+    await send_message(ctx, response=response + " well Hello there :wink:", is_private=True)
 
 
 @bot.command(name='pics', aliases=['piclist'])
@@ -115,26 +118,41 @@ async def whitelist_command(ctx, *, arg=""):
     else:
         await ctx.message.delete()
         response = ("Wrong channel :no_entry_sign:"
-                    " head over to : https://discord.com/channels/940587857414864976/1176913093050257440")
+                    " head over to : https://discord.com/channels/1234535098205081670/1238473007739965603")
         await send_message(ctx, response=response, is_private=False)
 
 
-@bot.command(name="fetch")
-async def fetch(ctx, file_type: str = ""):
-    if file_type == "docs":
-        view = MySelectDoc()
-        await ctx.send(f"Fetching", view=view)
-    elif file_type == "pics":
-        name = str(ctx.author)
-        pic_selector = MySelectPic(name)
-        view = discord.ui.View()
-        view.add_item(pic_selector)
-        await ctx.send(f"Fetching", view=view)
-    elif file_type == "vids":
-        view = MySelectVid()
-        await ctx.send(f"Fetching", view=view)
+@bot.command(name='fetch')
+async def fetch_command(ctx, file_type: str, file_index: int):
+    username = str(ctx.author)
+    if file_type == 'doc':
+        x = get_list_for_fetch(directory(username, "docs"), docs)
+        if 0 < file_index <= len(x):
+            response = {'file': f"{directory(username,'docs')}/{x[file_index - 1]}"}
+            await ctx.send(file=discord.File(response['file']))
+        else:
+            await ctx.send(f"Invalid file index {file_index} for {file_type}")
+
+    elif file_type == 'pic':
+        y = get_list_for_fetch(directory(username, "pics"), pics)
+        if 0 < file_index <= len(y):
+            response = {'file': f"{directory(username,'pics')}/{y[file_index - 1]}"}
+            print(discord.File(response['file']))
+            await ctx.send(file=discord.File(response['file']))
+        else:
+            await ctx.send(f"Invalid file index {file_index} for {file_type}")
+
+    elif file_type == 'vid':
+        z = get_list_for_fetch(f"{directory(username,'vids')}", vids)
+        if 0 < file_index <= len(z):
+            response = {'file': f"{directory(username,'vids')}/{z[file_index - 1]}"}
+            await ctx.send(file=discord.File(response['file']))
+        else:
+            await ctx.send(f"Invalid file index {file_index} for {file_type}")
+
     else:
-        await ctx.send(f"Arguments are : docs , pics, vids")
+        await ctx.send(f"Invalid file type {file_type}")
+
 
 
 @bot.command(name='delete')
@@ -173,7 +191,7 @@ async def on_message(message):
 
     print(f'{username} said: "{user_message}" ({channel})')
 
-    if message.author == bot.user :
+    if message.author == bot.user:
         return
     if 'bot' in user_message and str(message.author) != "Aki's Chat-Bot#6062":
 
